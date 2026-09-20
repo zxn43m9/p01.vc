@@ -1,1 +1,268 @@
-p01.vc
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>p01: network-backed</title>
+<meta name="description" content="p01: network-backed">
+<meta name="theme-color" content="#14222B">
+<link rel="icon" id="favicon" href="data:,">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #14222B;
+    --green: #00ff41;          /* terminal green */
+    --glow: 0, 255, 65;        /* same green as rgb, used for glow */
+    --muted: #6f8490;          /* one step lighter than the background */
+    --muted-hi: #9fb1bb;
+
+    /* pixel size scales with the viewport */
+    --cell: clamp(9px, min(calc((100vw - 48px) / 18.2), 9vh, 50px), 50px);
+    --gap: calc(var(--cell) * 0.075);
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body { height: 100%; }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    background: var(--bg);
+    color: var(--muted);
+    font-family: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* very soft light behind the logo + quiet vignette */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(45% 38% at 50% 47%, rgba(var(--glow), 0.05), transparent 70%),
+      radial-gradient(120% 95% at 50% 50%, transparent 55%, rgba(0, 0, 0, 0.28) 100%);
+  }
+
+  main {
+    position: relative;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+  }
+
+  /* ───────── logo ───────── */
+
+  #logo {
+    display: grid;
+    grid-template-columns: repeat(17, var(--cell));
+    grid-auto-rows: var(--cell);
+    gap: var(--gap);
+    filter: drop-shadow(0 0 calc(var(--cell) * 0.9) rgba(var(--glow), 0.12));
+  }
+
+  /* One sequence, like a boot/loading screen:
+     pixels power on left to right, a few blink a couple of times,
+     then everything holds still. */
+  .px {
+    position: relative;
+    display: block;
+    animation: boot 0.9s ease-out var(--bd) both;
+  }
+
+  .px::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--green);
+    box-shadow:
+      0 0 calc(var(--cell) * 0.55) rgba(var(--glow), 0.5),
+      0 0 calc(var(--cell) * 0.14) rgba(var(--glow), 0.85);
+  }
+
+  /* a few pixels blink hard, but only twice */
+  .px.k::before {
+    animation: kblink var(--kt) steps(1, end) var(--kd) 2;
+  }
+
+  /* power-on: stutters into place, then stays lit */
+  @keyframes boot {
+    0%   { opacity: 0; }
+    18%  { opacity: 1; }
+    30%  { opacity: 0.1; }
+    46%  { opacity: 1; }
+    58%  { opacity: 0.35; }
+    72%  { opacity: 1; }
+    100% { opacity: 1; }
+  }
+
+  @keyframes kblink {
+    0%  { opacity: 1; }
+    55% { opacity: 0.07; }
+  }
+
+  /* ───────── footer ───────── */
+
+  footer {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 0 clamp(20px, 4vw, 40px) calc(env(safe-area-inset-bottom, 0px) + clamp(20px, 3.5vh, 32px));
+    font-size: 11.5px;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    animation: settle 1.4s ease 2.6s both;
+  }
+
+  @keyframes settle {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  .loc { justify-self: start; }
+  .yr  { justify-self: end; }
+
+  .social {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .social a {
+    display: grid;
+    place-items: center;
+    width: 16px;
+    height: 16px;
+    color: var(--muted);
+    transition: color 0.2s ease, filter 0.2s ease;
+  }
+
+  .social a:hover,
+  .social a:focus-visible {
+    color: var(--green);
+    filter: drop-shadow(0 0 5px rgba(var(--glow), 0.6));
+  }
+
+  .social a:focus-visible {
+    outline: 1px solid var(--green);
+    outline-offset: 5px;
+  }
+
+  .social svg {
+    width: 16px;
+    height: 16px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  @media (max-width: 620px) {
+    footer {
+      grid-template-columns: 1fr auto;
+      row-gap: 18px;
+    }
+    .social { grid-column: 1 / -1; grid-row: 1; justify-self: center; }
+    .loc    { grid-row: 2; }
+    .yr     { grid-row: 2; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .px, .px::before, footer { animation: none !important; }
+  }
+</style>
+</head>
+
+<body>
+
+<main>
+  <div id="logo" role="img" aria-label="p.01"></div>
+</main>
+
+<footer>
+  <span class="loc">San Francisco, California</span>
+
+  <!-- ✎ links: replace the hrefs with your own -->
+  <nav class="social" aria-label="Social">
+    <a href="https://www.linkedin.com/company/p01" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+    </a>
+    <a href="mailto:hello@example.com" aria-label="Email">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+    </a>
+    <a href="https://www.tiktok.com/@p01" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 7.917v4.034a9.948 9.948 0 0 1-5-1.951v4.5a6.5 6.5 0 1 1-8-6.326v4.326a2.5 2.5 0 1 0 4 2v-11.5h4.083a6.005 6.005 0 0 0 4.917 4.917z"/></svg>
+    </a>
+    <a href="https://www.instagram.com/p01" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    </a>
+  </nav>
+
+  <span class="yr">2026</span>
+</footer>
+
+<script>
+  // p . 0 1 : 17 columns x 8 rows, "#" = lit pixel
+  const ART = [
+    ".........###...#.",
+    "........#...#.##.",
+    "####....#..##..#.",
+    "#...#...#.#.#..#.",
+    "#...#...##..#..#.",
+    "####..#..###..###",
+    "#................",
+    "#................"
+  ];
+
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const logo = document.getElementById("logo");
+
+  ART.forEach((row, r) => {
+    [...row].forEach((ch, c) => {
+      if (ch !== "#") return;
+      const px = document.createElement("i");
+      px.className = "px";
+      px.style.gridColumn = c + 1;
+      px.style.gridRow = r + 1;
+
+      // loads left to right with a little jitter, like a progress fill
+      const bd = c * 0.09 + rnd(0, 0.3);
+      const s = px.style;
+      s.setProperty("--bd", bd.toFixed(2) + "s");
+
+      if (Math.random() < 0.2) {                 // a few pixels blink twice after powering on
+        px.classList.add("k");
+        s.setProperty("--kt", rnd(0.5, 0.8).toFixed(2) + "s");
+        s.setProperty("--kd", (bd + 0.9).toFixed(2) + "s");
+      }
+      logo.appendChild(px);
+    });
+  });
+
+  // favicon: the "p" of the logo, drawn from the same pixel map
+  (function () {
+    const p = ART.slice(2).map(row => row.slice(0, 5));
+    let rects = "";
+    p.forEach((row, y) => [...row].forEach((ch, x) => {
+      if (ch === "#") rects += `<rect x="${x + 2.5}" y="${y + 2}" width="1" height="1"/>`;
+    }));
+    const svg =
+      `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10" shape-rendering="crispEdges">` +
+      `<rect width="10" height="10" rx="1.5" fill="#14222B"/><g fill="#00ff41">${rects}</g></svg>`;
+    document.getElementById("favicon").href = "data:image/svg+xml," + encodeURIComponent(svg);
+  })();
+</script>
+
+</body>
+</html>
